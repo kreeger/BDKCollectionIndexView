@@ -4,43 +4,53 @@
 
 @interface BDKCollectionIndexView ()
 
-/** A component that shows up under the letters to indicate the view is handling a touch or a pan.
+/**
+ A component that shows up under the letters to indicate the view is handling a touch or a pan.
  */
 @property (strong, nonatomic) UIView *touchStatusView;
 
-/** The collection of label subviews that are displayed (one for each index title).
+/**
+ The collection of label subviews that are displayed (one for each index title).
  */
 @property (strong, nonatomic) NSArray *indexLabels;
 
-/** A gesture recognizer that handles panning.
+/**
+ A gesture recognizer that handles panning.
  */
 @property (strong, nonatomic) UIPanGestureRecognizer *panner;
 
-/** A gesture recognizer that handles tapping.
+/**
+ A gesture recognizer that handles tapping.
  */
 @property (strong, nonatomic) UITapGestureRecognizer *tapper;
 
-/** A gesture recognizer that handles panning.
- */
 @property (readonly) CGFloat theDimension;
 
-/** Handles events sent by the tap gesture recognizer.
- *  @param recognizer the sender of the event; usually a UIPanGestureRecognizer.
+/**
+ Handles events sent by the tap gesture recognizer.
+ 
+ @param recognizer the sender of the event; usually a UIPanGestureRecognizer.
  */
 - (void)handleTap:(UITapGestureRecognizer *)recognizer;
 
-/** Handles events sent by the pan gesture recognizer.
- *  @param recognizer the sender of the event; usually a UIPanGestureRecognizer.
+/**
+ Handles events sent by the pan gesture recognizer.
+ 
+ @param recognizer the sender of the event; usually a UIPanGestureRecognizer.
  */
 - (void)handlePan:(UIPanGestureRecognizer *)recognizer;
 
-/** Handles logic for determining which label is under a given touch point, and sets `currentIndex` accordingly.
- *  @param point the touch point.
+/**
+ Handles logic for determining which label is under a given touch point, and sets `currentIndex` accordingly.
+ 
+ @param point the touch point.
  */
 - (void)setNewIndexForPoint:(CGPoint)point;
 
-/** Handles setting the alpha component level for the background color on the `touchStatusView`.
- *  @param flag if `YES`, the `touchStatusView` is set to be visible and dark-ish.
+/**
+ Handles setting the alpha component level for the background color on the `touchStatusView`.
+ 
+ @param flag if `YES`, the `touchStatusView` is set to be visible and dark-ish.
  */
 - (void)setBackgroundVisibility:(BOOL)flag;
 
@@ -50,28 +60,29 @@
 
 @synthesize currentIndex = _currentIndex, direction = _direction, theDimension = _theDimension;
 
-+ (id)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
++ (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
 }
 
-- (id)initWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
-    if (self = [super initWithFrame:frame]) {
-        if (CGRectGetWidth(frame) > CGRectGetHeight(frame))
-            _direction = BDKCollectionIndexViewDirectionHorizontal;
-        else _direction = BDKCollectionIndexViewDirectionVertical;
+- (instancetype)initWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
+    self = [super initWithFrame:frame];
+    if (!self) return nil;
 
-        _currentIndex = 0;
-        _endPadding = 2;
+    if (CGRectGetWidth(frame) > CGRectGetHeight(frame))
+        _direction = BDKCollectionIndexViewDirectionHorizontal;
+    else _direction = BDKCollectionIndexViewDirectionVertical;
 
-        _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-        [self addGestureRecognizer:_panner];
-        _tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
-        [self addGestureRecognizer:_tapper];
+    _currentIndex = 0;
+    _endPadding = 2;
 
-        [self addSubview:self.touchStatusView];
+    _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    [self addGestureRecognizer:_panner];
+    _tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    [self addGestureRecognizer:_tapper];
 
-        self.indexTitles = indexTitles;
-    }
+    [self addSubview:self.touchStatusView];
+
+    self.indexTitles = indexTitles;
 
     return self;
 }
@@ -180,6 +191,17 @@
 }
 
 #pragma mark - Gestures
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self];
+    [self setNewIndexForPoint:touchPoint];
+    [self setBackgroundVisibility:YES];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [self setBackgroundVisibility:NO];
+}
 
 - (void)handleTap:(UITapGestureRecognizer *)recognizer {
     [self setBackgroundVisibility:!(recognizer.state == UIGestureRecognizerStateEnded)];
