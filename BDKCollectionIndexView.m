@@ -159,9 +159,12 @@
 - (void)buildIndexLabels {
 
     NSMutableArray *workingLabels = [NSMutableArray arrayWithCapacity:self.indexTitles.count];
+    NSUInteger tag = 0;
     for (NSString *indexTitle in self.indexTitles) {
         UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
         label.text = indexTitle;
+        label.tag = tag;
+        tag = tag + 1;
         label.font = [UIFont boldSystemFontOfSize:12];
         label.backgroundColor = [UIColor clearColor];
         label.textColor = [UIColor colorWithRed:0.415 green:0.451 blue:0.490 alpha:1.0];
@@ -176,7 +179,7 @@
 - (void)setNewIndexForPoint:(CGPoint)point {
     for (UILabel *view in self.indexLabels) {
         if (CGRectContainsPoint(view.frame, point)) {
-            NSUInteger newIndex = [self.indexTitles indexOfObject:view.text];
+            NSUInteger newIndex = view.tag;
             if (newIndex != _currentIndex) {
                 _currentIndex = newIndex;
                 [self sendActionsForControlEvents:UIControlEventValueChanged];
