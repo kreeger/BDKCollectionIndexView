@@ -61,6 +61,22 @@ Then I merely watch for changes using this method (which was assigned to watch f
 
 Again, big thanks to @Yang for [the solution on which this is based][so].
 
+## The how-to
+
+Just use the awesome CocoaPods library for integrating this into your project.
+
+In your `Podfile`...
+
+``` ruby
+pod 'BDKCollectionIndexView'
+```
+
+Then run `pod install` and it'll be in your project workspace. Then implement as above!
+
+## Please...
+
+If you use this in your project, drop me a line and let me know! I'd love to hear about it. You can hit me up [via email](mailto:benjaminkreeger@gmail.com), on [Twitter](https://twitter.com/kreeger), or [carrier pigeon](http://www.phonemag.com/blog/wp-content/uploads/2009/04/pigeon_camera2.jpg).
+
 [so]:      http://stackoverflow.com/a/14443540/194869
 [pst]:     https://github.com/steipete/PSTCollectionView
 [ya]:      http://stackoverflow.com/users/45018/yang
