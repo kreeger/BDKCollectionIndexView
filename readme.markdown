@@ -81,3 +81,6 @@ If you use this in your project, drop me a line and let me know! I'd love to hea
 [pst]:     https://github.com/steipete/PSTCollectionView
 [ya]:      http://stackoverflow.com/users/45018/yang
 [gst]:     https://gist.github.com/kreeger/4755877
+
+## Contributors
+- [Adrian Maurer](https://github.com/VerticodeLabs)

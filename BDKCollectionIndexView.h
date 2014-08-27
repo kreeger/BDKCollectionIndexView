@@ -41,6 +41,13 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
 @property (readonly) NSString *currentIndexTitle;
 
 /**
+ The colors
+ */
+@property (strong, nonatomic) UIColor *labelColor;
+@property (strong, nonatomic) UIColor *backgroundColor;
+
+
+/**
  A class message to initialize and return an index view control, given a frame and a list of index titles.
  
  @param frame the frame to use when initializing the control.

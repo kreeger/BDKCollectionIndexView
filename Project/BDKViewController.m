@@ -3,6 +3,7 @@
 //  BDKCollectionIndexView
 //
 //  Created by Ben Kreeger on 10/22/13.
+//  Contributors: Adrian Maurer
 //  Copyright (c) 2013 Ben Kreeger. All rights reserved.
 //
 
@@ -33,6 +34,8 @@
 - (void)loadView {
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.view.backgroundColor = [UIColor whiteColor];
+    self.indexView.labelColor = [UIColor yellowColor];
+    self.indexView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.collectionView];
     [self.view addSubview:self.indexView];
 }
