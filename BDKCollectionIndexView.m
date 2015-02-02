@@ -140,6 +140,12 @@
 - (void)setIndexTitles:(NSArray *)indexTitles {
     if (_indexTitles == indexTitles) return;
     _indexTitles = indexTitles;
+	[self reloadData];
+}
+
+- (void)reloadData
+{
+
     [self.indexLabels makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self buildIndexLabels];
 }
