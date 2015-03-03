@@ -179,14 +179,29 @@
 }
 
 - (void)setNewIndexForPoint:(CGPoint)point {
+    NSInteger newIndex = -1;
+    
     for (UILabel *view in self.indexLabels) {
         if (CGRectContainsPoint(view.frame, point)) {
-            NSUInteger newIndex = view.tag;
-            if (newIndex != _currentIndex) {
-                _currentIndex = newIndex;
-                [self sendActionsForControlEvents:UIControlEventValueChanged];
-            }
+            newIndex = view.tag;
+            break;
         }
+    }
+    
+    if (newIndex == -1) {
+        UILabel *topLabel = self.indexLabels[0];
+        UILabel *bottomLabel = self.indexLabels[self.indexLabels.count - 1];
+        
+        if (point.y < topLabel.frame.origin.y) {
+            newIndex = topLabel.tag;
+        } else if (point.y > bottomLabel.frame.origin.y) {
+            newIndex = bottomLabel.tag;
+        }
+    }
+    
+    if (newIndex != -1 && newIndex != _currentIndex) {
+        _currentIndex = newIndex;
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
 
