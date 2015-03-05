@@ -24,8 +24,6 @@
  */
 @property (strong, nonatomic) UITapGestureRecognizer *tapper;
 
-@property (readonly) CGFloat theDimension;
-
 /**
  Handles events sent by the tap gesture recognizer.
  
@@ -58,7 +56,7 @@
 
 @implementation BDKCollectionIndexView
 
-@synthesize currentIndex = _currentIndex, direction = _direction, theDimension = _theDimension, labelColor = _labelColor, backgroundColor = _backgroundColor;
+@synthesize currentIndex = _currentIndex, direction = _direction, labelColor = _labelColor, backgroundColor = _backgroundColor;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
@@ -67,63 +65,83 @@
 - (instancetype)initWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     self = [super initWithFrame:frame];
     if (!self) return nil;
-
+    
     if (CGRectGetWidth(frame) > CGRectGetHeight(frame))
         _direction = BDKCollectionIndexViewDirectionHorizontal;
     else _direction = BDKCollectionIndexViewDirectionVertical;
-
+    
     _currentIndex = 0;
-    _endPadding = 2;
     _labelColor = [UIColor blackColor];
     _backgroundColor = [UIColor clearColor];
-
+    
     _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
     [self addGestureRecognizer:_panner];
     _tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     [self addGestureRecognizer:_tapper];
-
+    
     [self addSubview:self.touchStatusView];
-
+    
     self.indexTitles = indexTitles;
-
+    
     return self;
 }
 
 - (void)layoutSubviews {
-
-    CGFloat maxLength = 0.0;
+    CGSize labelSize;
+    CGFloat dimension;
+    CGFloat totalLabelsSize;
+    CGFloat positionOffset;
+    
     switch (_direction) {
         case BDKCollectionIndexViewDirectionHorizontal:
-            _theDimension = CGRectGetHeight(self.frame);
-            maxLength = CGRectGetWidth(self.frame) - (self.endPadding * 2);
+            dimension = CGRectGetHeight(self.frame);
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                labelSize = CGSizeMake(dimension - 6, dimension);
+            } else {
+                labelSize = CGSizeMake(dimension - 2, dimension);
+            }
+            totalLabelsSize = self.indexLabels.count * labelSize.width;
+            
+            while (totalLabelsSize > self.frame.size.width) {
+                labelSize = CGSizeMake(labelSize.width - 1, labelSize.height);
+                totalLabelsSize = self.indexLabels.count * labelSize.width;
+            }
+            
+            positionOffset = self.frame.size.width / 2 - totalLabelsSize / 2 - 2;
             break;
         case BDKCollectionIndexViewDirectionVertical:
-            _theDimension = CGRectGetWidth(self.frame);
-            maxLength = CGRectGetHeight(self.frame) - (self.endPadding * 2);
+            dimension = CGRectGetWidth(self.frame);
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                labelSize = CGSizeMake(dimension, dimension - 6);
+            } else {
+                labelSize = CGSizeMake(dimension, dimension - 2);
+            }
+            totalLabelsSize = self.indexLabels.count * labelSize.height;
+            
+            while (totalLabelsSize > self.frame.size.height) {
+                labelSize = CGSizeMake(labelSize.width, labelSize.height - 1);
+                totalLabelsSize = self.indexLabels.count * labelSize.height;
+            }
+            
+            positionOffset = self.frame.size.height / 2 - totalLabelsSize / 2 - 6;
             break;
     }
-
-    self.touchStatusView.frame = CGRectInset(self.bounds, 2, 2);
-    self.touchStatusView.layer.cornerRadius = floorf(self.theDimension / 2.75);
-
-    CGFloat cumulativeLength = self.endPadding;
-    CGSize labelSize = CGSizeMake(self.theDimension, self.theDimension);
-
-    CGFloat otherDimension = floorf(maxLength / self.indexLabels.count);
+    
     for (UILabel *label in self.indexLabels) {
         switch (self.direction) {
             case BDKCollectionIndexViewDirectionHorizontal:
-                labelSize.width = otherDimension;
-                label.frame = (CGRect){ { cumulativeLength, 0 }, labelSize };
-                cumulativeLength += CGRectGetWidth(label.frame);
+                label.frame = (CGRect){ { positionOffset, 0 }, labelSize };
+                positionOffset += CGRectGetWidth(label.frame);
                 break;
             case BDKCollectionIndexViewDirectionVertical:
-                labelSize.height = otherDimension;
-                label.frame = (CGRect){ { 0, cumulativeLength }, labelSize };
-                cumulativeLength += CGRectGetHeight(label.frame);
+                label.frame = (CGRect){ { 0, positionOffset }, labelSize };
+                positionOffset += CGRectGetHeight(label.frame);
                 break;
         }
     }
+    
+    self.touchStatusView.frame = CGRectInset(self.bounds, 2, 2);
+    self.touchStatusView.layer.cornerRadius = floorf(dimension / 2.75);
 }
 
 #pragma mark - Properties
@@ -132,7 +150,14 @@
     if (_touchStatusView) return _touchStatusView;
     _touchStatusView = [[UIView alloc] initWithFrame:CGRectInset(self.bounds, 2, 2)];
     _touchStatusView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
-    _touchStatusView.layer.cornerRadius = self.theDimension / 2;
+    CGFloat dimension;
+    switch (_direction) {
+        case BDKCollectionIndexViewDirectionHorizontal:
+            dimension = CGRectGetHeight(self.frame);
+        case BDKCollectionIndexViewDirectionVertical:
+            dimension = CGRectGetWidth(self.frame);
+    }
+    _touchStatusView.layer.cornerRadius = dimension / 2;
     _touchStatusView.layer.masksToBounds = YES;
     return _touchStatusView;
 }
@@ -148,18 +173,9 @@
     return self.indexTitles[self.currentIndex];
 }
 
-- (void)setEndPadding:(CGFloat)endPadding {
-    if (_endPadding == endPadding) return;
-    _endPadding = endPadding;
-
-    [self.indexTitles makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    [self buildIndexLabels];
-}
-
 #pragma mark - Subviews
 
 - (void)buildIndexLabels {
-
     NSMutableArray *workingLabels = [NSMutableArray arrayWithCapacity:self.indexTitles.count];
     NSUInteger tag = 0;
     for (NSString *indexTitle in self.indexTitles) {
@@ -174,7 +190,7 @@
         [self addSubview:label];
         [workingLabels addObject:label];
     }
-
+    
     self.indexLabels = [NSArray arrayWithArray:workingLabels];
 }
 

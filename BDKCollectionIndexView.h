@@ -26,11 +26,6 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
 @property (readonly, nonatomic) NSUInteger currentIndex;
 
 /**
- The number of points used for padding at the end caps of the view (assists in layout).
- */
-@property (nonatomic) CGFloat endPadding;
-
-/**
  The direction in which the control is oriented; this is automatically set based on the frame given.
  */
 @property (readonly) BDKCollectionIndexViewDirection direction;
