@@ -43,7 +43,6 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
 /**
  The colors
  */
-@property (strong, nonatomic) UIColor *labelColor;
 @property (strong, nonatomic) UIColor *backgroundColor;
 
 
