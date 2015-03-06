@@ -58,7 +58,7 @@
 
 @implementation BDKCollectionIndexView
 
-@synthesize currentIndex = _currentIndex, direction = _direction, theDimension = _theDimension, labelColor = _labelColor, backgroundColor = _backgroundColor;
+@synthesize currentIndex = _currentIndex, direction = _direction, theDimension = _theDimension, backgroundColor = _backgroundColor;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
@@ -74,7 +74,6 @@
 
     _currentIndex = 0;
     _endPadding = 2;
-    _labelColor = [UIColor blackColor];
     _backgroundColor = [UIColor clearColor];
 
     _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
@@ -128,12 +127,12 @@
 
 - (void)tintColorDidChange {
     if (self.tintAdjustmentMode == UIViewTintAdjustmentModeDimmed) {
-        for (UILabel *label in self.subviews) {
+        for (UILabel *label in self.indexLabels) {
             label.textColor = [UIColor lightGrayColor];
         }
     } else {
-        for (UILabel *label in self.subviews) {
-            label.textColor = self.labelColor;
+        for (UILabel *label in self.indexLabels) {
+            label.textColor = self.tintColor;
         }
     }
 }
@@ -181,7 +180,7 @@
         tag = tag + 1;
         label.font = [UIFont boldSystemFontOfSize:12];
         label.backgroundColor = _backgroundColor;
-        label.textColor = _labelColor;
+        label.textColor = self.tintColor;
         label.textAlignment = NSTextAlignmentCenter;
         [self addSubview:label];
         [workingLabels addObject:label];
