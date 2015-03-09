@@ -147,10 +147,7 @@
     if (newIndex >= 0) {
         _currentIndex = newIndex;
         [self sendActionsForControlEvents:UIControlEventValueChanged];
-        NSString *title = self.indexTitles[newIndex];
-        NSString *selectedString = NSLocalizedString(@"selected", @"word that indicates an item is selected");
-        NSString *annoucement = [NSString stringWithFormat:@"%@ ,%@", title.accessibilityLabel, selectedString];
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, annoucement);
+        [self announceNewSection];
     }
 }
 
@@ -160,11 +157,19 @@
     if (newIndex < self.indexLabels.count) {
         _currentIndex = newIndex;
         [self sendActionsForControlEvents:UIControlEventValueChanged];
-        NSString *title = self.indexTitles[newIndex];
-        NSString *selectedString = NSLocalizedString(@"selected", @"word that indicates an item is selected");
-        NSString *annoucement = [NSString stringWithFormat:@"%@ ,%@", title.accessibilityLabel, selectedString];
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, annoucement);
+        [self announceNewSection];
     }
+}
+
+- (void)announceNewSection {
+    NSString *title = self.indexTitles[self.currentIndex];
+    NSString *selectedString = NSLocalizedString(@"selected", @"word that indicates an item is selected");
+    NSString *titleToAnnounce = title.accessibilityLabel;
+    if (!titleToAnnounce) {
+        titleToAnnounce = title;
+    }
+    NSString *annoucement = [NSString stringWithFormat:@"%@ ,%@", titleToAnnounce, selectedString];
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, annoucement);
 }
 
 #pragma mark - Properties
