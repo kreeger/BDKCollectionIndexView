@@ -84,6 +84,10 @@
     [self addSubview:self.touchStatusView];
 
     self.indexTitles = indexTitles;
+    
+    self.isAccessibilityElement = YES;
+    self.accessibilityTraits = UIAccessibilityTraitAdjustable;
+    self.accessibilityLabel = NSLocalizedString(@"table index", @"title given to the section index control");
 
     return self;
 }
@@ -137,6 +141,32 @@
     }
 }
 
+- (void)accessibilityIncrement {
+    NSInteger currentIndex = self.currentIndex;
+    NSInteger newIndex = currentIndex - 1;
+    if (newIndex >= 0) {
+        _currentIndex = newIndex;
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
+        NSString *title = self.indexTitles[newIndex];
+        NSString *selectedString = NSLocalizedString(@"selected", @"word that indicates an item is selected");
+        NSString *annoucement = [NSString stringWithFormat:@"%@ ,%@", title.accessibilityLabel, selectedString];
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, annoucement);
+    }
+}
+
+- (void)accessibilityDecrement {
+    NSInteger currentIndex = self.currentIndex;
+    NSInteger newIndex = currentIndex + 1;
+    if (newIndex < self.indexLabels.count) {
+        _currentIndex = newIndex;
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
+        NSString *title = self.indexTitles[newIndex];
+        NSString *selectedString = NSLocalizedString(@"selected", @"word that indicates an item is selected");
+        NSString *annoucement = [NSString stringWithFormat:@"%@ ,%@", title.accessibilityLabel, selectedString];
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, annoucement);
+    }
+}
+
 #pragma mark - Properties
 
 - (UIView *)touchStatusView {
@@ -182,6 +212,7 @@
         label.backgroundColor = _backgroundColor;
         label.textColor = self.tintColor;
         label.textAlignment = NSTextAlignmentCenter;
+        label.isAccessibilityElement = NO;
         [self addSubview:label];
         [workingLabels addObject:label];
     }
