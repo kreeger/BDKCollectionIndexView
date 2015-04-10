@@ -129,14 +129,19 @@
 - (void)tintColorDidChange {
     if (self.tintAdjustmentMode == UIViewTintAdjustmentModeDimmed) {
         for (UILabel *label in self.subviews) {
-            label.textColor = [UIColor lightGrayColor];
+            if([label isKindOfClass:[UILabel class]]) {
+                label.textColor = [UIColor lightGrayColor];
+            }
         }
     } else {
         for (UILabel *label in self.subviews) {
-            label.textColor = self.labelColor;
+            if([label isKindOfClass:[UILabel class]]) {
+                label.textColor = self.labelColor;
+            }
         }
     }
 }
+
 
 #pragma mark - Properties
 
