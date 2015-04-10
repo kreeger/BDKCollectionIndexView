@@ -65,4 +65,9 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
  */
 - (instancetype)initWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles;
 
+/**
+ An instance method to force the index view control to reload the data. Invoked by -setIndexTitles:.
+ */
+- (void)reloadData;
+
 @end
