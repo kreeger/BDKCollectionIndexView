@@ -49,7 +49,12 @@
 
 @implementation BDKCollectionIndexView
 
-@synthesize currentIndex = _currentIndex, direction = _direction, theDimension = _theDimension, labelColor = _labelColor, backgroundColor = _backgroundColor;
+@synthesize
+	currentIndex = _currentIndex,
+	direction = _direction,
+	theDimension = _theDimension,
+	labelColor = _labelColor,
+	backgroundColor = _backgroundColor;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
@@ -59,9 +64,11 @@
     self = [super initWithFrame:frame];
     if (!self) return nil;
 
-    if (CGRectGetWidth(frame) > CGRectGetHeight(frame))
+	if (CGRectGetWidth(frame) > CGRectGetHeight(frame)) {
         _direction = BDKCollectionIndexViewDirectionHorizontal;
-    else _direction = BDKCollectionIndexViewDirectionVertical;
+	} else {
+		_direction = BDKCollectionIndexViewDirectionVertical;
+	}
 
     _currentIndex = 0;
     _endPadding = 2;
@@ -77,7 +84,8 @@
     _tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:handleGestureSelector];
     [self addGestureRecognizer:_tapper];
     
-    _longPresser = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:handleGestureSelector];
+    _longPresser = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+																 action:handleGestureSelector];
     _longPresser.delegate = self;
     _longPresser.minimumPressDuration = 0.01f;
     [self addGestureRecognizer:_longPresser];
@@ -128,17 +136,11 @@
 
 - (void)tintColorDidChange {
     if (self.tintAdjustmentMode == UIViewTintAdjustmentModeDimmed) {
-        for (UILabel *label in self.subviews) {
-            if([label isKindOfClass:[UILabel class]]) {
-                label.textColor = [UIColor lightGrayColor];
-            }
-        }
-    } else {
-        for (UILabel *label in self.subviews) {
-            if([label isKindOfClass:[UILabel class]]) {
-                label.textColor = self.labelColor;
-            }
-        }
+		[self.indexLabels makeObjectsPerformSelector:@selector(setTextColor:)
+										  withObject:[UIColor lightGrayColor]];
+	} else {
+		[self.indexLabels makeObjectsPerformSelector:@selector(setTextColor:)
+										  withObject:self.labelColor];
     }
 }
 
@@ -160,9 +162,7 @@
 	[self reloadData];
 }
 
-- (void)reloadData
-{
-
+- (void)reloadData {
     [self.indexLabels makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self buildIndexLabels];
 }
@@ -203,13 +203,13 @@
 
 - (void)setNewIndexForPoint:(CGPoint)point {
     for (UILabel *view in self.indexLabels) {
-        if (CGRectContainsPoint(view.frame, point)) {
-            NSUInteger newIndex = view.tag;
-            if (newIndex != _currentIndex) {
-                _currentIndex = newIndex;
-                [self sendActionsForControlEvents:UIControlEventValueChanged];
-            }
-        }
+		if (!CGRectContainsPoint(view.frame, point)) { continue; }
+		
+		NSUInteger newIndex = view.tag;
+		if (newIndex == _currentIndex) { continue; }
+	
+		_currentIndex = newIndex;
+		[self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
 
@@ -226,7 +226,7 @@
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
-shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+	shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return gestureRecognizer != _longPresser;
 }
 
