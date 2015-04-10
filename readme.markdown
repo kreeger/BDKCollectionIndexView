@@ -1,10 +1,12 @@
 # BDKCollectionIndexView
 
-> An index-title-scrubber-bar, for use with a `UICollectionView` or as a replacement for the one provided by a `UITableView`. Gives a collection/table view the index title bar for `-sectionIndexTitles` that a `UITableView` gets for (almost) free. A huge thank you to @Yang from [this Stack Overflow post][so], which saved my bacon here.
+An index-title-scrubber-bar, for use with a `UICollectionView` or as a replacement for the one provided by a `UITableView`. Gives a collection/table view the index title bar for `-sectionIndexTitles` that a `UITableView` gets for (almost) free. A huge thank you to @Yang from [this Stack Overflow post][so], which saved my bacon here.
+
+![gif](http://g.recordit.co/9vLag8rpPS.gif)
 
 ## Usage
 
-Drop it in your `Podfile`!
+To install it via [CocoaPods](http://cocoapods.org), just drop this line in your `Podfile`:
 
 ```ruby
 pod 'BDKCollectionIndexView'
@@ -42,6 +44,8 @@ Then, when you have the section index titles (rather, the label values that you 
 ```swift
 self.indexView.indexTitles = self.resultsController.sectionIndexTitles
 ```
+
+You can modify `backgroundColor` and `touchStatusBackgroundColor` property to change the background color of the "touch status view" that appears when the view is touched. Use `tintColor` of `BDKCollectionIndexView` instance to change the color of text labels.
 
 Again, big thanks to @Yang for [the solution on which this is based][so].
 
