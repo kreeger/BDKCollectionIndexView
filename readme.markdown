@@ -1,62 +1,46 @@
 # BDKCollectionIndexView
 
-> An index-title-scrubber-bar, for use with a `UICollectionView` (or even a `PSTCollectionView`). Gives a collection view the index title bar for `-sectionIndexTitles` that a `UITableView` gets for (almost) free. A huge thank you to @Yang from [this Stack Overflow post][so], which saved my bacon here.
+> An index-title-scrubber-bar, for use with a `UICollectionView` or as a replacement for the one provided by a `UITableView`. Gives a collection/table view the index title bar for `-sectionIndexTitles` that a `UITableView` gets for (almost) free. A huge thank you to @Yang from [this Stack Overflow post][so], which saved my bacon here.
 
-## The problem
+## Usage
 
-When you're using a `UITableView` and you define the `UITableViewDataSource` method `-sectionIndexTitlesForTableView:`, you get a sweet right-hand-side view for scrubbing through a long table view of fields, separated by sections. The titles are the names of the sections, by default (or at least letters based on the section names).
+Drop it in your `Podfile`!
 
-![UITableView with section index titles](http://s3.media.squarespace.com/production/1368321/16106782/_ULITs-nDV7k/TPRg9P_NtHI/AAAAAAAAEi8/gFWaiTD3Ygw/s1600/Apple%2BDefault%2BSection%2BTitle%2BViews.png)
+```ruby
+pod 'BDKCollectionIndexView'
+```
 
-Unfortunately, you get jack when you use a `UICollectionView` (or in my case, a [`PSTCollectionView`][pst]). There's no similar method defined on the `UICollectionViewDataSource` protocol. Stack Overflow to the rescue!
+And then run `pod install`, naturally. After that, create an instance of `BDKCollectionIndexView`, and add it as a subview of whatever `view` contains your `tableView` or `collectionView` (but not the `tableView` or `collectionView` itself). Then assign it a `width` value of 28 (or `height`, if you're using it as a horizontal index view). Attach whatever other layout constraints you see fit!
 
-## The solution
+```swift
+override func viewDidLoad() {
+    super.viewDidLoad()
 
-This solution was presented by [Yang][ya] on [Stack Overflow][so]. Just roll your own! By subclassing `UIControl`, laying out a series of `UILabel` views in a vertical (or horizontal) fashion, and watching over them with a `UITapGestureRecognizer` and `UIPanGestureRecognizer`, you can get your own `sectionIndexTitles` bar thing. [I've written a gist that covers the header and implementation][gst] in full, based on Yang's proposal. I use it in a controller like so.
+    let indexWidth = 28
+    let frame = CGRect(x: collectionView.frame.size.width - indexWidth,
+        y: collectionView.frame.size.height,
+        width: indexWidth,
+        height: collectionView.frame.size.height)
+    var indexView = BDKCollectionIndexView(frame: frame, indexTitles: nil)
+    indexView.autoresizingMask = .FlexibleHeight | .FlexibleLeftMargin
+    indexView.addTarget(self, action: "indexViewValueChanged:", forControlEvents: .ValueChanged)
+    view.addSubview(indexView)
+}
 
-``` objective-c
-@property (strong, nonatomic) BDKCollectionIndexView *indexView;
-
-- (BDKCollectionIndexView *)indexView {
-    if (_indexView) return _indexView;
-    CGFloat indexWidth = 28;
-    CGRect frame = CGRectMake(CGRectGetWidth(self.collectionView.frame) - indexWidth,
-                              CGRectGetMinY(self.collectionView.frame),
-                              indexWidth,
-                              CGRectGetHeight(self.collectionView.frame));
-    _indexView = [BDKCollectionIndexView indexViewWithFrame:frame indexTitles:@[]];
-    _indexView.autoresizingMask = (UIViewAutoresizingFlexibleHeight |
-                                   UIViewAutoresizingFlexibleLeftMargin);
-    [_indexView addTarget:self
-                   action:@selector(indexViewValueChanged:)
-         forControlEvents:UIControlEventValueChanged];
-    return _indexView;
+func indexViewValueChanged(sender: BDKCollectionIndexView) {
+    let path = NSIndexPath(forItem: 0, inSection: sender.currentIndex)
+    collectionView.scrollToItemAtIndexPath(path, atScrollPosition: .Top, animated: false)
+    // If you're using a collection view, bump the y-offset by a certain number of points
+    // because it won't otherwise account for any section headers you may have.
+    collectionView.contentOffset = CGPoint(x: collectionView.contentOffset.x,
+        y: collectionView.contentOffset.y - 45.0)
 }
 ```
 
-When my collection view has loaded data in it, I set the `indexTitles` property of my `self.indexView` (I'm using a `NSFetchedResultsController` in a parent class that also serves a sub-class that manages a `UITableView`; go-go-gadget code reuse!).
+Then, when you have the section index titles (rather, the label values that you want to appear on the index bar), assign that array to the index bar instance's `indexTitles` value.
 
-``` objective-c
-self.indexView.indexTitles = self.resultsController.sectionIndexTitles;
-```
-
-Then I merely watch for changes using this method (which was assigned to watch for `UIControlEventValueChanged`).
-
-``` objective-c
-- (void)indexViewValueChanged:(BDKCollectionIndexView *)sender {
-    NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:sender.currentIndex];
-
-    // If you're using UICollectionView, substitute "PST" for "UI" and you're all set.
-    [self.collectionView scrollToItemAtIndexPath:path
-                                atScrollPosition:PSTCollectionViewScrollPositionTop
-                                        animated:NO];
-
-    // I bump the y-offset up by 45 points here to account for aligning the top of
-    // the section header view with the top of the collectionView frame. It's
-    // hardcoded, but you get the idea.
-    self.collectionView.contentOffset = CGPointMake(self.collectionView.contentOffset.x,
-                                                    self.collectionView.contentOffset.y - 45);
-}
+```swift
+self.indexView.indexTitles = self.resultsController.sectionIndexTitles
 ```
 
 Again, big thanks to @Yang for [the solution on which this is based][so].
@@ -82,5 +66,14 @@ If you use this in your project, drop me a line and let me know! I'd love to hea
 [ya]:      http://stackoverflow.com/users/45018/yang
 [gst]:     https://gist.github.com/kreeger/4755877
 
+## Contact
+
+- [Ben Kreeger](https://github.com/kreeger)
+
 ## Contributors
+
 - [Adrian Maurer](https://github.com/VerticodeLabs)
+- [hipwelljo](https://github.com/hipwelljo)
+- [Alex Skorulis](https://github.com/skorulis)
+- [Rinat Khanov](https://github.com/rinatkhanov)
+- [huperniketes](https://github.com/huperniketes)
