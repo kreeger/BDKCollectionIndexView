@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 
+@protocol BDKCollectionIndexViewDelegate;
+
 /**
  The direction in which the control is oriented. Assists in determining layout values.
  */
@@ -14,6 +16,8 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
  @Yang from http://stackoverflow.com/a/14443540/194869, which saved my bacon here.
  */
 @interface BDKCollectionIndexView : UIControl
+
+@property (weak, nonatomic) id<BDKCollectionIndexViewDelegate> delegate;
 
 /**
  A collection of string values that represent section index titles.
@@ -60,5 +64,14 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
  An instance method to force the index view control to reload the data. Invoked by -setIndexTitles:.
  */
 - (void)reloadData;
+
+@end
+
+@protocol BDKCollectionIndexViewDelegate <NSObject>
+
+@optional
+
+- (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView isPressedOnIndex:(NSUInteger)pressedIndex;
+- (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView liftedFingerFromIndex:(NSUInteger)pressedIndex;
 
 @end

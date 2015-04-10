@@ -50,6 +50,7 @@
 @implementation BDKCollectionIndexView
 
 @synthesize
+	delegate = _delegate,
 	currentIndex = _currentIndex,
 	direction = _direction,
 	backgroundColor = _backgroundColor;
@@ -290,6 +291,18 @@
 - (void)handleGesture:(UIGestureRecognizer *)recognizer {
     [self setBackgroundVisibility:!(recognizer.state == UIGestureRecognizerStateEnded)];
     [self setNewIndexForPoint:[recognizer locationInView:self]];
+	
+	if (recognizer != _longPresser) { return; }
+	if (recognizer.state == UIGestureRecognizerStateEnded) {
+		if ([self.delegate respondsToSelector:@selector(collectionIndexView:liftedFingerFromIndex:)]) {
+			[self.delegate collectionIndexView:self liftedFingerFromIndex:self.currentIndex];
+		}
+	} else {
+		if ([self.delegate respondsToSelector:@selector(collectionIndexView:isPressedOnIndex:)]) {
+			[self.delegate collectionIndexView:self isPressedOnIndex:self.currentIndex];
+		}
+	}
+	
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
