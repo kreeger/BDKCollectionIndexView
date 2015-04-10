@@ -170,6 +170,7 @@
     if (_touchStatusView) return _touchStatusView;
     _touchStatusView = [[UIView alloc] initWithFrame:CGRectInset(self.bounds, 2, 2)];
     _touchStatusView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
+	
     CGFloat dimension;
     switch (_direction) {
         case BDKCollectionIndexViewDirectionHorizontal:
@@ -177,6 +178,7 @@
         case BDKCollectionIndexViewDirectionVertical:
             dimension = CGRectGetWidth(self.frame);
     }
+	
     _touchStatusView.layer.cornerRadius = dimension / 2;
     _touchStatusView.layer.masksToBounds = YES;
     return _touchStatusView;
