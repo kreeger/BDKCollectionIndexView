@@ -39,7 +39,16 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
  */
 @property (readonly) NSString *currentIndexTitle;
 
-@property (strong, nonatomic) UIColor *backgroundColor;
+/**
+ The background color of the "touch status view" that appears when the view is touched.
+ */
+@property (strong, nonatomic) UIColor *touchStatusBackgroundColor;
+
+/**
+ The amount of alpha applied to the "touch status view" that appears when the view is touched.
+ */
+@property (nonatomic) CGFloat touchStatusViewAlpha;
+//@property (strong, nonatomic) UIColor *backgroundColor;
 
 
 /**
@@ -71,7 +80,7 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
 
 @optional
 
-- (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView isPressedOnIndex:(NSUInteger)pressedIndex;
+- (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView isPressedOnIndex:(NSUInteger)pressedIndex indexTitle:(NSString *)indexTitle;
 - (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView liftedFingerFromIndex:(NSUInteger)pressedIndex;
 
 @end

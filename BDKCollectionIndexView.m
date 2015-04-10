@@ -52,8 +52,9 @@
 @synthesize
 	delegate = _delegate,
 	currentIndex = _currentIndex,
-	direction = _direction,
-	backgroundColor = _backgroundColor;
+	touchStatusBackgroundColor = _touchStatusBackgroundColor,
+    touchStatusViewAlpha = _touchStatusViewAlpha,
+    direction = _direction;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
@@ -70,8 +71,10 @@
 	}
 
     _currentIndex = 0;
+	_touchStatusViewAlpha = 0.25;
+	_touchStatusBackgroundColor = [UIColor blackColor];
 	self.tintColor = [UIColor blackColor];
-    _backgroundColor = [UIColor clearColor];
+    self.backgroundColor = [UIColor clearColor];
 	
     SEL handleGestureSelector = @selector(handleGesture:);
 
@@ -244,7 +247,7 @@
         label.tag = tag;
         tag = tag + 1;
         label.font = [UIFont boldSystemFontOfSize:12];
-        label.backgroundColor = _backgroundColor;
+        label.backgroundColor = self.backgroundColor;
         label.textColor = self.tintColor;
         label.textAlignment = NSTextAlignmentCenter;
         label.isAccessibilityElement = NO;
@@ -282,8 +285,8 @@
 }
 
 - (void)setBackgroundVisibility:(BOOL)flag {
-    CGFloat alpha = flag ? 0.25 : 0;
-    self.touchStatusView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:alpha];
+    CGFloat alpha = flag ? self.touchStatusViewAlpha : 0;
+    self.touchStatusView.backgroundColor = [self.touchStatusBackgroundColor colorWithAlphaComponent:alpha];
 }
 
 #pragma mark - Gestures
@@ -298,8 +301,9 @@
 			[self.delegate collectionIndexView:self liftedFingerFromIndex:self.currentIndex];
 		}
 	} else {
-		if ([self.delegate respondsToSelector:@selector(collectionIndexView:isPressedOnIndex:)]) {
-			[self.delegate collectionIndexView:self isPressedOnIndex:self.currentIndex];
+		if ([self.delegate respondsToSelector:@selector(collectionIndexView:isPressedOnIndex:indexTitle:)]) {
+			
+			[self.delegate collectionIndexView:self isPressedOnIndex:self.currentIndex indexTitle:self.currentIndexTitle];
 		}
 	}
 	
