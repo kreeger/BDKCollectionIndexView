@@ -54,6 +54,7 @@
 	currentIndex = _currentIndex,
 	touchStatusBackgroundColor = _touchStatusBackgroundColor,
     touchStatusViewAlpha = _touchStatusViewAlpha,
+    font = _font,
     direction = _direction;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
@@ -211,9 +212,9 @@
     CGFloat dimension;
     switch (_direction) {
         case BDKCollectionIndexViewDirectionHorizontal:
-            dimension = CGRectGetHeight(self.frame);
+            dimension = CGRectGetHeight(self.bounds);
         case BDKCollectionIndexViewDirectionVertical:
-            dimension = CGRectGetWidth(self.frame);
+            dimension = CGRectGetWidth(self.bounds);
     }
 	
     _touchStatusView.layer.cornerRadius = dimension / 2;
@@ -236,6 +237,17 @@
     return self.indexTitles[self.currentIndex];
 }
 
+- (UIFont *)font {
+    return _font ? _font : [UIFont boldSystemFontOfSize:12.0f];
+}
+
+- (void)setFont:(UIFont *)font {
+    _font = font;
+    for (UILabel *label in self.indexLabels) {
+        label.font = font;
+    }
+}
+
 #pragma mark - Subviews
 
 - (void)buildIndexLabels {
@@ -246,7 +258,7 @@
         label.text = indexTitle;
         label.tag = tag;
         tag = tag + 1;
-        label.font = [UIFont boldSystemFontOfSize:12];
+        label.font = self.font;
         label.backgroundColor = self.backgroundColor;
         label.textColor = self.tintColor;
         label.textAlignment = NSTextAlignmentCenter;
