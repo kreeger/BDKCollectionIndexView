@@ -52,7 +52,6 @@
 @synthesize
 	currentIndex = _currentIndex,
 	direction = _direction,
-	labelColor = _labelColor,
 	backgroundColor = _backgroundColor;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
@@ -70,7 +69,7 @@
 	}
 
     _currentIndex = 0;
-    _labelColor = [UIColor blackColor];
+	self.tintColor = [UIColor blackColor];
     _backgroundColor = [UIColor clearColor];
 	
     SEL handleGestureSelector = @selector(handleGesture:);
@@ -159,7 +158,7 @@
 										  withObject:[UIColor lightGrayColor]];
 	} else {
 		[self.indexLabels makeObjectsPerformSelector:@selector(setTextColor:)
-										  withObject:self.labelColor];
+										  withObject:self.tintColor];
     }
 }
 
@@ -211,7 +210,7 @@
         tag = tag + 1;
         label.font = [UIFont boldSystemFontOfSize:12];
         label.backgroundColor = _backgroundColor;
-        label.textColor = _labelColor;
+        label.textColor = self.tintColor;
         label.textAlignment = NSTextAlignmentCenter;
         [self addSubview:label];
         [workingLabels addObject:label];
