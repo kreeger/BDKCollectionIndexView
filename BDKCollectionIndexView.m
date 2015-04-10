@@ -2,7 +2,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-@interface BDKCollectionIndexView ()
+@interface BDKCollectionIndexView () <UIGestureRecognizerDelegate>
 
 /**
  A component that shows up under the letters to indicate the view is handling a touch or a pan.
@@ -25,18 +25,11 @@
 @property (strong, nonatomic) UITapGestureRecognizer *tapper;
 
 /**
- Handles events sent by the tap gesture recognizer.
- 
- @param recognizer the sender of the event; usually a UIPanGestureRecognizer.
+ A gesture recognizer that handles long presses.
  */
-- (void)handleTap:(UITapGestureRecognizer *)recognizer;
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPresser;
 
-/**
- Handles events sent by the pan gesture recognizer.
- 
- @param recognizer the sender of the event; usually a UIPanGestureRecognizer.
- */
-- (void)handlePan:(UIPanGestureRecognizer *)recognizer;
+@property (readonly) CGFloat theDimension;
 
 /**
  Handles logic for determining which label is under a given touch point, and sets `currentIndex` accordingly.
@@ -56,7 +49,11 @@
 
 @implementation BDKCollectionIndexView
 
-@synthesize currentIndex = _currentIndex, direction = _direction, labelColor = _labelColor, backgroundColor = _backgroundColor;
+@synthesize
+	currentIndex = _currentIndex,
+	direction = _direction,
+	labelColor = _labelColor,
+	backgroundColor = _backgroundColor;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
@@ -65,20 +62,32 @@
 - (instancetype)initWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     self = [super initWithFrame:frame];
     if (!self) return nil;
-    
-    if (CGRectGetWidth(frame) > CGRectGetHeight(frame))
+
+	if (CGRectGetWidth(frame) > CGRectGetHeight(frame)) {
         _direction = BDKCollectionIndexViewDirectionHorizontal;
-    else _direction = BDKCollectionIndexViewDirectionVertical;
-    
+	} else {
+		_direction = BDKCollectionIndexViewDirectionVertical;
+	}
+
     _currentIndex = 0;
     _labelColor = [UIColor blackColor];
     _backgroundColor = [UIColor clearColor];
-    
-    _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+	
+    SEL handleGestureSelector = @selector(handleGesture:);
+
+    _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:handleGestureSelector];
+    _panner.delegate = self;
     [self addGestureRecognizer:_panner];
-    _tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    
+    _tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:handleGestureSelector];
     [self addGestureRecognizer:_tapper];
     
+    _longPresser = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+																 action:handleGestureSelector];
+    _longPresser.delegate = self;
+    _longPresser.minimumPressDuration = 0.01f;
+    [self addGestureRecognizer:_longPresser];
+
     [self addSubview:self.touchStatusView];
     
     self.indexTitles = indexTitles;
@@ -144,6 +153,17 @@
     self.touchStatusView.layer.cornerRadius = floorf(dimension / 2.75);
 }
 
+- (void)tintColorDidChange {
+    if (self.tintAdjustmentMode == UIViewTintAdjustmentModeDimmed) {
+		[self.indexLabels makeObjectsPerformSelector:@selector(setTextColor:)
+										  withObject:[UIColor lightGrayColor]];
+	} else {
+		[self.indexLabels makeObjectsPerformSelector:@selector(setTextColor:)
+										  withObject:self.labelColor];
+    }
+}
+
+
 #pragma mark - Properties
 
 - (UIView *)touchStatusView {
@@ -165,6 +185,10 @@
 - (void)setIndexTitles:(NSArray *)indexTitles {
     if (_indexTitles == indexTitles) return;
     _indexTitles = indexTitles;
+	[self reloadData];
+}
+
+- (void)reloadData {
     [self.indexLabels makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self buildIndexLabels];
 }
@@ -195,14 +219,28 @@
 }
 
 - (void)setNewIndexForPoint:(CGPoint)point {
+    NSInteger newIndex = -1;
+    
     for (UILabel *view in self.indexLabels) {
-        if (CGRectContainsPoint(view.frame, point)) {
-            NSUInteger newIndex = view.tag;
-            if (newIndex != _currentIndex) {
-                _currentIndex = newIndex;
-                [self sendActionsForControlEvents:UIControlEventValueChanged];
-            }
+		if (!CGRectContainsPoint(view.frame, point)) { continue; }
+		newIndex = view.tag;
+		break;
+    }
+    
+    if (newIndex == -1) {
+        UILabel *topLabel = self.indexLabels[0];
+        UILabel *bottomLabel = self.indexLabels[self.indexLabels.count - 1];
+        
+        if (point.y < topLabel.frame.origin.y) {
+            newIndex = topLabel.tag;
+        } else if (point.y > bottomLabel.frame.origin.y) {
+            newIndex = bottomLabel.tag;
         }
+    }
+    
+    if (newIndex != -1 && newIndex != _currentIndex) {
+        _currentIndex = newIndex;
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
 
@@ -213,26 +251,14 @@
 
 #pragma mark - Gestures
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint touchPoint = [touch locationInView:self];
-    [self setNewIndexForPoint:touchPoint];
-    [self setBackgroundVisibility:YES];
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    [self setBackgroundVisibility:NO];
-}
-
-- (void)handleTap:(UITapGestureRecognizer *)recognizer {
+- (void)handleGesture:(UIGestureRecognizer *)recognizer {
     [self setBackgroundVisibility:!(recognizer.state == UIGestureRecognizerStateEnded)];
     [self setNewIndexForPoint:[recognizer locationInView:self]];
 }
 
-- (void)handlePan:(UIPanGestureRecognizer *)recognizer {
-    [self setBackgroundVisibility:!(recognizer.state == UIGestureRecognizerStateEnded)];
-    CGPoint translation = [recognizer locationInView:self];
-    [self setNewIndexForPoint:translation];
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+	shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return gestureRecognizer != _longPresser;
 }
 
 @end
