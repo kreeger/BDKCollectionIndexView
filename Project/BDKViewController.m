@@ -34,14 +34,20 @@
 - (void)loadView {
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.view.backgroundColor = [UIColor whiteColor];
-    self.indexView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.collectionView];
     [self.view addSubview:self.indexView];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.sections = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9",@"10"];
+    
+    // Create data
+    NSMutableArray *sections = [NSMutableArray new];
+    for (NSInteger count = 0; count <= 30; count++) {
+        [sections addObject:[NSString stringWithFormat:@"%ld", (long)count]];
+    }
+    
+    self.sections = sections.copy;
     self.indexView.indexTitles = self.sections;
 }
 
