@@ -34,15 +34,43 @@
 - (void)loadView {
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.view.backgroundColor = [UIColor whiteColor];
-    self.indexView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.collectionView];
     [self.view addSubview:self.indexView];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.sections = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9",@"10"];
+    
+    // Create data
+    NSMutableArray *sections = [NSMutableArray new];
+    for (NSInteger count = 0; count <= 30; count++) {
+        [sections addObject:[NSString stringWithFormat:@"%ld", (long)count]];
+    }
+    
+    self.sections = sections.copy;
     self.indexView.indexTitles = self.sections;
+}
+
+- (void)viewWillLayoutSubviews {
+    const CGFloat indexWidth = 28.0f;
+    NSDictionary *views = @{@"iv" : self.indexView};
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.indexView
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[iv]-0-|"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:views]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[iv(w)]-0-|"
+                                                                      options:0
+                                                                      metrics:@{@"w" : @(indexWidth)}                                                    views:views]];
 }
 
 #pragma mark - Properties
@@ -66,12 +94,8 @@
 
 - (BDKCollectionIndexView *)indexView {
     if (_indexView) return _indexView;
-    CGRect frame = CGRectMake(CGRectGetWidth(self.collectionView.frame) - 28,
-                              CGRectGetMinY(self.collectionView.frame) + 64,
-                              28,
-                              CGRectGetHeight(self.collectionView.frame) - 64);
-    _indexView = [BDKCollectionIndexView indexViewWithFrame:frame indexTitles:@[]];
-    _indexView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin);
+    _indexView = [BDKCollectionIndexView indexViewWithFrame:CGRectZero indexTitles:@[]];
+    _indexView.translatesAutoresizingMaskIntoConstraints = NO;   // auto layout
     [_indexView addTarget:self action:@selector(indexViewValueChanged:) forControlEvents:UIControlEventValueChanged];
     return _indexView;
 }
