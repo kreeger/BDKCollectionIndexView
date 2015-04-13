@@ -40,6 +40,11 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
 @property (readonly) NSString *currentIndexTitle;
 
 /**
+ Preferred font of the index labels. By default, bold system font of size 12.
+ */
+@property (strong, nonatomic) UIFont *font;
+
+/**
  The background color of the "touch status view" that appears when the view is touched.
  */
 @property (strong, nonatomic) UIColor *touchStatusBackgroundColor;

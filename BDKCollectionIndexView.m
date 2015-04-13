@@ -54,6 +54,7 @@
 	currentIndex = _currentIndex,
 	touchStatusBackgroundColor = _touchStatusBackgroundColor,
     touchStatusViewAlpha = _touchStatusViewAlpha,
+    font = _font,
     direction = _direction;
 
 + (instancetype)indexViewWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
@@ -118,28 +119,28 @@
             }
             totalLabelsSize = self.indexLabels.count * labelSize.width;
             
-            while (totalLabelsSize > self.frame.size.width) {
+            while (totalLabelsSize > self.bounds.size.width) {
                 labelSize = CGSizeMake(labelSize.width - 1, labelSize.height);
                 totalLabelsSize = self.indexLabels.count * labelSize.width;
             }
             
-            positionOffset = self.frame.size.width / 2 - totalLabelsSize / 2 - 2;
+            positionOffset = self.bounds.size.width / 2 - totalLabelsSize / 2 - 2;
             break;
         case BDKCollectionIndexViewDirectionVertical:
             dimension = CGRectGetWidth(self.frame);
             if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
                 labelSize = CGSizeMake(dimension, dimension - 6);
             } else {
-                labelSize = CGSizeMake(dimension, dimension - 2);
+                labelSize = CGSizeMake(dimension, dimension);
             }
             totalLabelsSize = self.indexLabels.count * labelSize.height;
             
-            while (totalLabelsSize > self.frame.size.height) {
+            while (totalLabelsSize > self.bounds.size.height) {
                 labelSize = CGSizeMake(labelSize.width, labelSize.height - 1);
                 totalLabelsSize = self.indexLabels.count * labelSize.height;
             }
             
-            positionOffset = self.frame.size.height / 2 - totalLabelsSize / 2 - 6;
+            positionOffset = self.bounds.size.height / 2 - totalLabelsSize / 2 - 1;
             break;
     }
     
@@ -211,9 +212,9 @@
     CGFloat dimension;
     switch (_direction) {
         case BDKCollectionIndexViewDirectionHorizontal:
-            dimension = CGRectGetHeight(self.frame);
+            dimension = CGRectGetHeight(self.bounds);
         case BDKCollectionIndexViewDirectionVertical:
-            dimension = CGRectGetWidth(self.frame);
+            dimension = CGRectGetWidth(self.bounds);
     }
 	
     _touchStatusView.layer.cornerRadius = dimension / 2;
@@ -236,6 +237,17 @@
     return self.indexTitles[self.currentIndex];
 }
 
+- (UIFont *)font {
+    return _font ? _font : [UIFont boldSystemFontOfSize:12.0f];
+}
+
+- (void)setFont:(UIFont *)font {
+    _font = font;
+    for (UILabel *label in self.indexLabels) {
+        label.font = font;
+    }
+}
+
 #pragma mark - Subviews
 
 - (void)buildIndexLabels {
@@ -246,7 +258,7 @@
         label.text = indexTitle;
         label.tag = tag;
         tag = tag + 1;
-        label.font = [UIFont boldSystemFontOfSize:12];
+        label.font = self.font;
         label.backgroundColor = self.backgroundColor;
         label.textColor = self.tintColor;
         label.textAlignment = NSTextAlignmentCenter;
