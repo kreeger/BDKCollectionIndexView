@@ -273,10 +273,28 @@
 - (void)setNewIndexForPoint:(CGPoint)point {
     NSInteger newIndex = -1;
     
+    BOOL (^matchesPoint)(UIView *) = ^(UIView *view) { return YES; };
+    
+    switch (_direction) {
+        case BDKCollectionIndexViewDirectionHorizontal:
+            matchesPoint = ^BOOL(UIView *view) {
+                return (point.x >= CGRectGetMinX(view.frame) &&
+                        point.x <= CGRectGetMaxX(view.frame));
+            };
+            break;
+            
+        case BDKCollectionIndexViewDirectionVertical:
+            matchesPoint = ^BOOL(UIView *view) {
+                return (point.y >= CGRectGetMinY(view.frame) &&
+                        point.y <= CGRectGetMaxY(view.frame));
+            };
+            break;
+    }
+    
     for (UILabel *view in self.indexLabels) {
-		if (!CGRectContainsPoint(view.frame, point)) { continue; }
-		newIndex = view.tag;
-		break;
+        if (!matchesPoint(view)) { continue; }
+        newIndex = view.tag;
+        break;
     }
     
     if (newIndex == -1) {
