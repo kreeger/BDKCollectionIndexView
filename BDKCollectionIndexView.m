@@ -61,24 +61,41 @@
     return [[self alloc] initWithFrame:frame indexTitles:indexTitles];
 }
 
+-(instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (!self) return nil;
+    
+    [self setupWithIndexTitles:nil];
+    
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame indexTitles:(NSArray *)indexTitles {
     self = [super initWithFrame:frame];
     if (!self) return nil;
 
-	if (CGRectGetWidth(frame) > CGRectGetHeight(frame)) {
+    if (CGRectGetWidth(frame) > CGRectGetHeight(frame)) {
         _direction = BDKCollectionIndexViewDirectionHorizontal;
-	} else {
-		_direction = BDKCollectionIndexViewDirectionVertical;
-	}
+    } else {
+        _direction = BDKCollectionIndexViewDirectionVertical;
+    }
+    
+    [self setupWithIndexTitles:indexTitles];
+    
+    return self;
+}
 
+-(void)setupWithIndexTitles:(NSArray *)indexTitles {
+    
     _currentIndex = 0;
-	_touchStatusViewAlpha = 0.25;
-	_touchStatusBackgroundColor = [UIColor blackColor];
-	self.tintColor = [UIColor blackColor];
+    _touchStatusViewAlpha = 0.25;
+    _touchStatusBackgroundColor = [UIColor blackColor];
+    self.tintColor = [UIColor blackColor];
     self.backgroundColor = [UIColor clearColor];
-	
+    
     SEL handleGestureSelector = @selector(handleGesture:);
-
+    
     _panner = [[UIPanGestureRecognizer alloc] initWithTarget:self action:handleGestureSelector];
     _panner.delegate = self;
     [self addGestureRecognizer:_panner];
@@ -87,11 +104,11 @@
     [self addGestureRecognizer:_tapper];
     
     _longPresser = [[UILongPressGestureRecognizer alloc] initWithTarget:self
-																 action:handleGestureSelector];
+                                                                 action:handleGestureSelector];
     _longPresser.delegate = self;
     _longPresser.minimumPressDuration = 0.01f;
     [self addGestureRecognizer:_longPresser];
-
+    
     [self addSubview:self.touchStatusView];
     
     self.indexTitles = indexTitles;
@@ -99,8 +116,6 @@
     self.isAccessibilityElement = YES;
     self.accessibilityTraits = UIAccessibilityTraitAdjustable;
     self.accessibilityLabel = NSLocalizedString(@"table index", @"title given to the section index control");
-
-    return self;
 }
 
 - (void)layoutSubviews {
