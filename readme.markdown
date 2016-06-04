@@ -51,7 +51,7 @@ Again, big thanks to @Yang for [the solution on which this is based][so].
 
 ## Please...
 
-If you use this in your project, drop me a line and let me know! I'd love to hear about it. You can hit me up [via email](mailto:benjaminkreeger@gmail.com), on [Twitter](https://twitter.com/kreeger), or [carrier pigeon](http://www.phonemag.com/blog/wp-content/uploads/2009/04/pigeon_camera2.jpg).
+If you use this in your project, drop me a line and let me know! I'd love to hear about it. You can hit me up [via email](mailto:benjaminkreeger@gmail.com), on [Twitter](https://twitter.com/kreeger), or [carrier pigeon](http://www.hostmedic.com/wp-content/uploads/2009/09/pigeon_camera2.jpg).
 
 [so]:      http://stackoverflow.com/a/14443540/194869
 [pst]:     https://github.com/steipete/PSTCollectionView
