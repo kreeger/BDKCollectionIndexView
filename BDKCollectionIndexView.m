@@ -286,6 +286,8 @@
 }
 
 - (void)setNewIndexForPoint:(CGPoint)point {
+    if (self.indexLabels.count<1) return;
+    
     NSInteger newIndex = -1;
     
     BOOL (^matchesPoint)(UIView *) = ^(UIView *view) { return YES; };
