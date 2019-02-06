@@ -88,6 +88,7 @@
 
 -(void)setupWithIndexTitles:(NSArray *)indexTitles {
     
+    _colorPeekView = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:1];
     _currentIndex = 0;
     _touchStatusViewAlpha = 0.25;
     _touchStatusBackgroundColor = [UIColor blackColor];
@@ -314,6 +315,44 @@
         break;
     }
     
+    if ([self.delegate respondsToSelector:@selector(collectionIndexView:index:)]) {
+        NSAttributedString * attr = [self.delegate collectionIndexView:self index:self.currentIndex];
+        if (attr != NULL) {
+            UIView * peekView = [self viewWithTag:9999];
+            UILabel * titleLabel = [peekView viewWithTag:9998];
+            if(peekView == NULL) {
+                peekView = [UIView new];
+                peekView.layer.cornerRadius = 25;
+                peekView.layer.backgroundColor = self.colorPeekView.CGColor;
+                peekView.tag = 9999;
+                peekView.alpha = 0;
+                [self addSubview:peekView];
+                
+                titleLabel = [UILabel new];
+                titleLabel.tag = 9998;
+                [peekView addSubview:titleLabel];
+                [UIView animateWithDuration:0.3 animations:^{
+                    peekView.alpha = 1;
+                }];
+            }
+            
+            CGFloat maxOffset = self.frame.size.height - 50;
+            CGFloat minOffset = 0;
+            CGFloat peekOffset = point.y;
+            if (peekOffset > maxOffset){
+                peekOffset = maxOffset;
+            }
+            else if (peekOffset < minOffset) {
+                peekOffset = minOffset;
+            }
+            
+            peekView.frame = CGRectMake( (self.frame.size.width + 25) * -1, peekOffset, 50, 50);
+            titleLabel.frame = peekView.bounds;
+            titleLabel.attributedText = attr;
+            titleLabel.textAlignment = NSTextAlignmentCenter;
+        }
+    }
+    
     if (newIndex == -1) {
         UILabel *topLabel = self.indexLabels[0];
         UILabel *bottomLabel = self.indexLabels[self.indexLabels.count - 1];
@@ -344,6 +383,14 @@
 	
 	if (recognizer != _longPresser) { return; }
 	if (recognizer.state == UIGestureRecognizerStateEnded) {
+        
+        UIView *peekView = [self viewWithTag:9999];
+        [UIView animateWithDuration:0.3 animations:^{
+            peekView.alpha = 0;
+        } completion:^(BOOL finished) {
+            [peekView removeFromSuperview];
+        }];
+        
 		if ([self.delegate respondsToSelector:@selector(collectionIndexView:liftedFingerFromIndex:)]) {
 			[self.delegate collectionIndexView:self liftedFingerFromIndex:self.currentIndex];
 		}
