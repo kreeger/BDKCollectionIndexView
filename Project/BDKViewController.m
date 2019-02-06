@@ -13,7 +13,7 @@
 
 #import "BDKCell.h"
 
-@interface BDKViewController () <UICollectionViewDataSource>
+@interface BDKViewController () <UICollectionViewDataSource,BDKCollectionIndexViewDelegate>
 
 @property (strong, nonatomic) UICollectionView *collectionView;
 
@@ -49,6 +49,7 @@
     
     self.sections = sections.copy;
     self.indexView.indexTitles = self.sections;
+    self.indexView.delegate = self;
 }
 
 - (void)viewWillLayoutSubviews {
@@ -129,4 +130,14 @@
     return cell;
 }
 
+
+-(NSAttributedString*)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView index:(NSUInteger)index {
+    
+    NSAttributedString * attr = [[NSAttributedString alloc]initWithString: self.sections[index]];
+    
+    return attr;
+}
+
 @end
+
+

@@ -24,6 +24,8 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
  */
 @property (strong, nonatomic) NSArray *indexTitles;
 
+@property (strong, nonatomic) UIColor *colorPeekView;
+
 /**
  Indicates the position of the last-selected index title. Should map directly to a table view / collection section.
  */
@@ -87,5 +89,7 @@ typedef NS_ENUM(NSInteger, BDKCollectionIndexViewDirection) {
 
 - (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView isPressedOnIndex:(NSUInteger)pressedIndex indexTitle:(NSString *)indexTitle;
 - (void)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView liftedFingerFromIndex:(NSUInteger)pressedIndex;
+
+- (NSAttributedString *)collectionIndexView:(BDKCollectionIndexView *)collectionIndexView index:(NSUInteger )index;
 
 @end
