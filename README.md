@@ -4,7 +4,9 @@ An index-title-scrubber-bar, for use with a `UICollectionView` or as a replaceme
 
 ![gif](http://g.recordit.co/9vLag8rpPS.gif)
 
-## Usage
+## Setup
+
+### CocoaPods
 
 To install it via [CocoaPods](http://cocoapods.org), just drop this line in your `Podfile`:
 
@@ -12,7 +14,22 @@ To install it via [CocoaPods](http://cocoapods.org), just drop this line in your
 pod 'BDKCollectionIndexView'
 ```
 
-And then run `pod install`, naturally. After that, create an instance of `BDKCollectionIndexView`, and add it as a subview of whatever `view` contains your `tableView` or `collectionView` (but not the `tableView` or `collectionView` itself). Then assign it a `width` value of 28 (or `height`, if you're using it as a horizontal index view). Attach whatever other layout constraints you see fit!
+And then run `pod install`, naturally. 
+
+### Swift Package Manager 
+
+Alternatively you can integrate directly in Xcode using Swift Package Manager. You can find more info about this dependency manager [here](https://www.swift.org/package-manager/)
+
+ To integrate using Xcode:
+
+ File -> Swift Packages -> Add Package Dependency
+
+ Enter package URL: https://github.com/kreeger/BDKCollectionIndexView
+
+ See [here](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app) for more info
+
+## Usage 
+After that, create an instance of `BDKCollectionIndexView`, and add it as a subview of whatever `view` contains your `tableView` or `collectionView` (but not the `tableView` or `collectionView` itself). Then assign it a `width` value of 28 (or `height`, if you're using it as a horizontal index view). Attach whatever other layout constraints you see fit!
 
 ```swift
 override func viewDidLoad() {
