@@ -13,7 +13,8 @@ let package = Package(
 	targets: [
         .target(
            name: "BDKCollectionIndexView",
-           publicHeadersPath: "Sources/BDKCollectionIndexView"
+           path: "Sources/BDKCollectionIndexView",
+           publicHeadersPath: "."
         )
     ]
 )
