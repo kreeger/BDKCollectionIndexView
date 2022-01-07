@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
 	name: "BDKCollectionIndexView",
 	platforms: [
-        .iOS(.v15)
+        .iOS(.v8)
     ],
     products: [
         .library(name: "BDKCollectionIndexView",
